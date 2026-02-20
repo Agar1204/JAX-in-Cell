@@ -11,6 +11,7 @@ def test_set_BC_single_particle_periodic():
     v_n = jnp.array([1.0, 1.0, 1.0])
     q = 1.0
     q_m = 1.0
+    m = 1.0
     dx = 0.1
     grid = jnp.linspace(0.0, 1, 10)
     box_size_x = 2.0
@@ -19,8 +20,8 @@ def test_set_BC_single_particle_periodic():
     BC_left = 0
     BC_right = 0
 
-    x_n_updated, v_n_updated, q_updated, q_m_updated = set_BC_single_particle(
-        x_n, v_n, q, q_m, dx, grid, box_size_x, box_size_y, box_size_z, BC_left, BC_right
+    x_n_updated, v_n_updated, q_updated, q_m_updated, _ = set_BC_single_particle(
+        x_n, v_n, q, q_m, m, dx, grid, box_size_x, box_size_y, box_size_z, BC_left, BC_right
     )
 
     assert jnp.allclose(x_n_updated, jnp.array([0.1, 0.5, 0.8])), "Periodic BC failed for position"
@@ -33,6 +34,7 @@ def test_set_BC_single_particle_reflective():
     v_n = jnp.array([1.0, 1.0, 1.0])
     q = 1.0
     q_m = 1.0
+    m = 1.0
     dx = 0.1
     grid = jnp.linspace(-1.0, 1.0, 10)
     box_size_x = 2.0
@@ -41,8 +43,8 @@ def test_set_BC_single_particle_reflective():
     BC_left = 1
     BC_right = 1
 
-    x_n_updated, v_n_updated, q_updated, q_m_updated = set_BC_single_particle(
-        x_n, v_n, q, q_m, dx, grid, box_size_x, box_size_y, box_size_z, BC_left, BC_right
+    x_n_updated, v_n_updated, q_updated, q_m_updated, _ = set_BC_single_particle(
+        x_n, v_n, q, q_m, m, dx, grid, box_size_x, box_size_y, box_size_z, BC_left, BC_right
     )
 
     assert jnp.allclose(x_n_updated, jnp.array([-0.9, -1.0, -1.0])), "Reflective BC failed for position"
@@ -55,6 +57,7 @@ def test_set_BC_single_particle_absorbing():
     v_n = jnp.array([1.0, 1.0, 1.0])
     q = 1.0
     q_m = 1.0
+    m = 1.0
     dx = 0.1
     grid = jnp.linspace(-1.0, 1.0, 10)
     box_size_x = 2.0
@@ -63,8 +66,8 @@ def test_set_BC_single_particle_absorbing():
     BC_left = 2
     BC_right = 2
 
-    x_n_updated, v_n_updated, q_updated, q_m_updated = set_BC_single_particle(
-        x_n, v_n, q, q_m, dx, grid, box_size_x, box_size_y, box_size_z, BC_left, BC_right
+    x_n_updated, v_n_updated, q_updated, q_m_updated, _ = set_BC_single_particle(
+        x_n, v_n, q, q_m, m, dx, grid, box_size_x, box_size_y, box_size_z, BC_left, BC_right
     )
 
     assert jnp.allclose(x_n_updated, jnp.array([1.3, -1.0, -1.0])), "Absorbing BC failed for position"
@@ -77,6 +80,7 @@ def test_set_BC_single_particle_mixed():
     v_n = jnp.array([1.0, 1.0, 1.0])
     q = 1.0
     q_m = 1.0
+    m = 1.0
     dx = 0.1
     grid = jnp.linspace(-1.0, 1.0, 10)
     box_size_x = 2.0
@@ -85,8 +89,8 @@ def test_set_BC_single_particle_mixed():
     BC_left = 1
     BC_right = 2
 
-    x_n_updated, v_n_updated, q_updated, q_m_updated = set_BC_single_particle(
-        x_n, v_n, q, q_m, dx, grid, box_size_x, box_size_y, box_size_z, BC_left, BC_right
+    x_n_updated, v_n_updated, q_updated, q_m_updated, _ = set_BC_single_particle(
+        x_n, v_n, q, q_m, m, dx, grid, box_size_x, box_size_y, box_size_z, BC_left, BC_right
     )
 
     assert jnp.allclose(x_n_updated, jnp.array([-0.9, -1.0, -1.0])), "Mixed BC failed for position"
@@ -179,6 +183,7 @@ def test_set_BC_single_particle_periodic():
     v_n = jnp.array([1.0, 1.0, 1.0])
     q = 1.0
     q_m = 1.0
+    m = 1.0
     dx = 0.1
     grid = jnp.linspace(-1.0, 1.0, 10)
     box_size_x = 2.0
@@ -187,8 +192,8 @@ def test_set_BC_single_particle_periodic():
     BC_left = 0
     BC_right = 0
 
-    x_n_updated, v_n_updated, q_updated, q_m_updated = set_BC_single_particle(
-        x_n, v_n, q, q_m, dx, grid, box_size_x, box_size_y, box_size_z, BC_left, BC_right
+    x_n_updated, v_n_updated, q_updated, q_m_updated, _ = set_BC_single_particle(
+        x_n, v_n, q, q_m, m, dx, grid, box_size_x, box_size_y, box_size_z, BC_left, BC_right
     )
 
     assert jnp.allclose(x_n_updated, jnp.array([1.0, -1.0, -1.0])), "Periodic BC failed for position"
@@ -201,6 +206,7 @@ def test_set_BC_single_particle_reflective():
     v_n = jnp.array([1.0, 1.0, 1.0])
     q = 1.0
     q_m = 1.0
+    m = 1.0
     dx = 0.1
     grid = jnp.linspace(-1.0, 1.0, 10)
     box_size_x = 2.0
@@ -209,8 +215,8 @@ def test_set_BC_single_particle_reflective():
     BC_left = 1
     BC_right = 1
 
-    x_n_updated, v_n_updated, q_updated, q_m_updated = set_BC_single_particle(
-        x_n, v_n, q, q_m, dx, grid, box_size_x, box_size_y, box_size_z, BC_left, BC_right
+    x_n_updated, v_n_updated, q_updated, q_m_updated, _ = set_BC_single_particle(
+        x_n, v_n, q, q_m, m, dx, grid, box_size_x, box_size_y, box_size_z, BC_left, BC_right
     )
 
     assert jnp.allclose(x_n_updated, jnp.array([-0.9, -1.0, -1.0])), "Reflective BC failed for position"
@@ -223,6 +229,7 @@ def test_set_BC_single_particle_absorbing():
     v_n = jnp.array([1.0, 1.0, 1.0])
     q = 1.0
     q_m = 1.0
+    m = 1.0
     dx = 0.1
     grid = jnp.linspace(-1.0, 1.0, 10)
     box_size_x = 2.0
@@ -231,8 +238,8 @@ def test_set_BC_single_particle_absorbing():
     BC_left = 2
     BC_right = 2
 
-    x_n_updated, v_n_updated, q_updated, q_m_updated = set_BC_single_particle(
-        x_n, v_n, q, q_m, dx, grid, box_size_x, box_size_y, box_size_z, BC_left, BC_right
+    x_n_updated, v_n_updated, q_updated, q_m_updated, _ = set_BC_single_particle(
+        x_n, v_n, q, q_m, m, dx, grid, box_size_x, box_size_y, box_size_z, BC_left, BC_right
     )
 
     assert jnp.allclose(x_n_updated, jnp.array([1.3, -1.0, -1.0])), "Absorbing BC failed for position"
@@ -245,6 +252,7 @@ def test_set_BC_single_particle_mixed():
     v_n = jnp.array([1.0, 1.0, 1.0])
     q = 1.0
     q_m = 1.0
+    m = 1.0
     dx = 0.1
     grid = jnp.linspace(-1.0, 1.0, 10)
     box_size_x = 2.0
@@ -253,14 +261,48 @@ def test_set_BC_single_particle_mixed():
     BC_left = 1
     BC_right = 2
 
-    x_n_updated, v_n_updated, q_updated, q_m_updated = set_BC_single_particle(
-        x_n, v_n, q, q_m, dx, grid, box_size_x, box_size_y, box_size_z, BC_left, BC_right
+    x_n_updated, v_n_updated, q_updated, q_m_updated, _ = set_BC_single_particle(
+        x_n, v_n, q, q_m, m, dx, grid, box_size_x, box_size_y, box_size_z, BC_left, BC_right
     )
 
     assert jnp.allclose(x_n_updated, jnp.array([-0.9, -1.0, -1.0])), "Mixed BC failed for position"
     assert jnp.allclose(v_n_updated, jnp.array([-1.0, 1.0, 1.0])), "Mixed BC failed for velocity"
     assert q_updated == 1.0, "Mixed BC failed for charge"
     assert q_m_updated == 1.0, "Mixed BC failed for charge-to-mass ratio"
+
+def test_set_BC_single_particle_bc3():
+    dx = 0.1
+    grid = jnp.linspace(-1.0, 1.0, 10)
+    box_size_x = 2.0
+    box_size_y = 2.0
+    box_size_z = 2.0
+    q = 2.0
+    q_m = 0.5
+    m = 4.0
+
+    # Particle exits left wall (BC_left = 3)
+    x_n = jnp.array([-1.1, 0.0, 0.0])
+    v_n = jnp.array([-1.0, 0.5, 0.3])
+    x_n_updated, v_n_updated, q_updated, q_m_updated, m_updated = set_BC_single_particle(
+        x_n, v_n, q, q_m, m, dx, grid, box_size_x, box_size_y, box_size_z, BC_left=3, BC_right=0
+    )
+    assert jnp.allclose(x_n_updated, jnp.array([-0.9, 0.0, 0.0])), "Mixed BC left: position not reflected"
+    assert jnp.allclose(v_n_updated, jnp.array([1.0, 0.5, 0.3])), "Mixed BC left: vx not flipped"
+    assert jnp.allclose(q_updated, 1.0), "Mixed BC left: charge not halved"
+    assert jnp.allclose(q_m_updated, 0.5), "Mixed BC left: q_m must not change"
+    assert jnp.allclose(m_updated, 2.0), "Mixed BC left: mass not halved"
+
+    # Particle exits right wall (BC_right = 3)
+    x_n = jnp.array([1.1, 0.0, 0.0])
+    v_n = jnp.array([1.0, 0.5, 0.3])
+    x_n_updated, v_n_updated, q_updated, q_m_updated, m_updated = set_BC_single_particle(
+        x_n, v_n, q, q_m, m, dx, grid, box_size_x, box_size_y, box_size_z, BC_left=0, BC_right=3
+    )
+    assert jnp.allclose(x_n_updated, jnp.array([0.9, 0.0, 0.0])), "Mixed BC right: position not reflected"
+    assert jnp.allclose(v_n_updated, jnp.array([-1.0, 0.5, 0.3])), "Mixed BC right: vx not flipped"
+    assert jnp.allclose(q_updated, 1.0), "Mixed BC right: charge not halved"
+    assert jnp.allclose(q_m_updated, 0.5), "Mixed BC right: q_m must not change"
+    assert jnp.allclose(m_updated, 2.0), "Mixed BC right: mass not halved"
 
 def test_set_BC_particles_periodic():
     xs_n = jnp.array([[1.0, 2.0, 3.0], [-1.0, -2.0, -3.0]])
@@ -342,6 +384,36 @@ def test_set_BC_particles_absorbing():
     assert jnp.allclose(ms_updated, ms)
     assert jnp.allclose(q_ms_updated, expected_q_ms)
 
+def test_set_BC_particles_bc3():
+    # Three particles: one hits right wall, one hits left wall, one stays inside.
+    xs_n = jnp.array([[6.0, 0.0, 0.0], [-6.0, 0.0, 0.0], [0.0, 0.0, 0.0]])
+    vs_n = jnp.array([[1.0, 0.5, 0.3], [-1.0, 0.5, 0.3], [0.5, 0.5, 0.5]])
+    qs   = jnp.array([2.0, 2.0, 2.0])
+    ms   = jnp.array([4.0, 4.0, 4.0])
+    q_ms = jnp.array([0.5, 0.5, 0.5])
+    dx = 0.1
+    grid = jnp.linspace(-5.0, 5.0, 100)
+    box_size_x = 10.0
+    box_size_y = 10.0
+    box_size_z = 10.0
+
+    xs_n_updated, vs_n_updated, qs_updated, ms_updated, q_ms_updated = set_BC_particles(
+        xs_n, vs_n, qs, ms, q_ms, dx, grid, box_size_x, box_size_y, box_size_z, BC_left=3, BC_right=3
+    )
+
+    expected_xs = jnp.array([[4.0, 0.0, 0.0], [-4.0, 0.0, 0.0], [0.0, 0.0, 0.0]])
+    expected_vs = jnp.array([[-1.0, 0.5, 0.3], [1.0, 0.5, 0.3], [0.5, 0.5, 0.5]])
+    expected_qs = jnp.array([1.0, 1.0, 2.0])   # wall-hitting particles halved; inside unchanged
+    expected_ms = jnp.array([2.0, 2.0, 4.0])   # same
+    expected_q_ms = jnp.array([0.5, 0.5, 0.5]) # q_m never changes
+
+    assert jnp.allclose(xs_n_updated, expected_xs), "Mixed BC particles: positions wrong"
+    assert jnp.allclose(vs_n_updated, expected_vs), "Mixed BC particles: velocities wrong"
+    assert jnp.allclose(qs_updated, expected_qs), "Mixed BC particles: charges not halved"
+    assert jnp.allclose(ms_updated, expected_ms), "Mixed BC particles: masses not halved"
+    assert jnp.allclose(q_ms_updated, expected_q_ms), "Mixed BC particles: q_m must not change"
+
+
 def test_set_BC_single_particle_positions():
     x_n = jnp.array([1.0, 1.0, 1.0])
     box_size_x = 2.0
@@ -385,6 +457,22 @@ def test_set_BC_single_particle_positions():
     x_n = jnp.array([-1.1, 1.0, 1.0])
     x_n_updated = set_BC_single_particle_positions(x_n, dx, grid, box_size_x, box_size_y, box_size_z, BC_left, BC_right)
     assert jnp.allclose(x_n_updated, jnp.array([grid[0] - 1.5 * dx, -1.0, -1.0])), "Absorbing BC failed for position"
+
+    BC_left = 3
+    BC_right = 3
+    # Particle exits left wall with BC_left=3: reflected like BC=1
+    x_n = jnp.array([-1.1, 0.0, 0.0])
+    x_n_updated = set_BC_single_particle_positions(
+        x_n, dx, grid, box_size_x, box_size_y, box_size_z, BC_left=3, BC_right=0
+    )
+    assert jnp.allclose(x_n_updated, jnp.array([-0.9, 0.0, 0.0])), "Mixed BC positions left: position not reflected"
+
+    # Particle exits right wall with BC_right=3: reflected like BC=1
+    x_n = jnp.array([1.1, 0.0, 0.0])
+    x_n_updated = set_BC_single_particle_positions(
+        x_n, dx, grid, box_size_x, box_size_y, box_size_z, BC_left=0, BC_right=3
+    )
+    assert jnp.allclose(x_n_updated, jnp.array([0.9, 0.0, 0.0])), "Mixed BC positions right: position not reflected"
 
 def test_field_ghost_cells_E():
     field_BC_left = 0
