@@ -118,6 +118,7 @@ def initialize_simulation_parameters(user_parameters={}):
         "ion_mass_over_proton_mass": 1,           # Ion mass in units of the proton mass
         "relativistic": False,                    # Use relativistic Boris pusher
         "tolerance_Picard_iterations_implicit_CN": 1e-6, # Tolerance for Picard iterations in implicit Crank-Nicholson method
+        "mixed_BC_weight": 0.5,                      # Fraction of macroparticle reflected at mixed BC wall (BC=3); must be between 0 and 1
 
         # Boundary conditions
         "particle_BC_left":  0,                   # Left boundary condition for particles
@@ -561,6 +562,16 @@ def simulation(input_parameters={}, number_grid_points=100, number_pseudoelectro
     field_BC_right = parameters["field_BC_right"]
     particle_BC_left = parameters["particle_BC_left"]
     particle_BC_right = parameters["particle_BC_right"]
+    mixed_BC_weight = parameters["mixed_BC_weight"]
+
+    # Coerce degenerate mixed_BC_weight values: weight=0 → fully absorbing (BC=2), weight=1 → fully reflective (BC=1)
+    assert 0.0 <= mixed_BC_weight <= 1.0, f"mixed_BC_weight must be between 0 and 1, got {mixed_BC_weight}"
+    if mixed_BC_weight == 0.0:
+        particle_BC_left  = 2 if particle_BC_left  == 3 else particle_BC_left
+        particle_BC_right = 2 if particle_BC_right == 3 else particle_BC_right
+    elif mixed_BC_weight == 1.0:
+        particle_BC_left  = 1 if particle_BC_left  == 3 else particle_BC_left
+        particle_BC_right = 1 if particle_BC_right == 3 else particle_BC_right
 
     # **Use provided positions/velocities if given, otherwise use defaults**
     if positions is None:
@@ -578,7 +589,7 @@ def simulation(input_parameters={}, number_grid_points=100, number_pseudoelectro
     positions_plus1_2, velocities, qs, ms, q_ms = set_BC_particles(
         positions + (dt / 2) * velocities, velocities,
         parameters["charges"], parameters["masses"], parameters["charge_to_mass_ratios"],
-        dx, grid, *box_size, particle_BC_left, particle_BC_right)
+        dx, grid, *box_size, particle_BC_left, particle_BC_right, mixed_BC_weight)
 
     positions_minus1_2 = set_BC_positions(
         positions - (dt / 2) * velocities,
@@ -592,7 +603,7 @@ def simulation(input_parameters={}, number_grid_points=100, number_pseudoelectro
         )
         step_func = lambda carry, step_index: Boris_step(
             carry, step_index, parameters, dx, dt, grid, box_size,
-            particle_BC_left, particle_BC_right, field_BC_left, field_BC_right, field_solver
+            particle_BC_left, particle_BC_right, field_BC_left, field_BC_right, mixed_BC_weight, field_solver
         )
     else:
         initial_carry = (
@@ -601,7 +612,7 @@ def simulation(input_parameters={}, number_grid_points=100, number_pseudoelectro
         )
         step_func = lambda carry, step_index: CN_step(
             carry, step_index, parameters, dx, dt, grid, box_size,
-            particle_BC_left, particle_BC_right, field_BC_left, field_BC_right,
+            particle_BC_left, particle_BC_right, field_BC_left, field_BC_right, mixed_BC_weight,
             parameters["number_of_particle_substeps_implicit_CN"]
         )
 
@@ -614,7 +625,7 @@ def simulation(input_parameters={}, number_grid_points=100, number_pseudoelectro
     _, results = lax.scan(simulation_step, initial_carry, jnp.arange(total_steps))
 
     # Unpack results
-    positions_over_time, velocities_over_time, electric_field_over_time, \
+    positions_over_time, velocities_over_time, masses_over_time, electric_field_over_time, \
     magnetic_field_over_time, current_density_over_time, charge_density_over_time = results
 
     # **Output results**
@@ -632,6 +643,7 @@ def simulation(input_parameters={}, number_grid_points=100, number_pseudoelectro
         "positions": positions_over_time,
         "velocities": velocities_over_time,
         "masses": parameters["masses"],
+        "masses_over_time": masses_over_time,
         "charges": parameters["charges"],
         "electric_field":  electric_field_over_time,
         "magnetic_field":  magnetic_field_over_time,

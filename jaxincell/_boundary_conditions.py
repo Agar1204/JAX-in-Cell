@@ -4,7 +4,7 @@ from ._constants import speed_of_light
 
 __all__ = ['set_BC_single_particle', 'set_BC_particles', 'set_BC_single_particle_positions', 'set_BC_positions']
 
-def set_BC_single_particle(x_n, v_n, q, q_m, m, dx, grid, box_size_x, box_size_y, box_size_z, BC_left, BC_right):
+def set_BC_single_particle(x_n, v_n, q, q_m, m, dx, grid, box_size_x, box_size_y, box_size_z, BC_left, BC_right, mixed_BC_weight):
     """
     Applies boundary conditions (BCs) to a single particle's position and velocity.
 
@@ -30,7 +30,6 @@ def set_BC_single_particle(x_n, v_n, q, q_m, m, dx, grid, box_size_x, box_size_y
     x_n1 = (x_n[1] + box_size_y / 2) % box_size_y - box_size_y / 2
     x_n2 = (x_n[2] + box_size_z / 2) % box_size_z - box_size_z / 2
 
-    weight_ratio = 0.5 # In mixed BCs, this ratio determines how much of the particle's properties are reflected vs absorbed.
     hit_left_boundary = x_n[0] < -box_size_x / 2
     hit_right_boundary = x_n[0] > box_size_x / 2
 
@@ -68,14 +67,14 @@ def set_BC_single_particle(x_n, v_n, q, q_m, m, dx, grid, box_size_x, box_size_y
     absorbed = (hit_left_boundary & (BC_left == 2)) | (hit_right_boundary & (BC_right == 2))
     mixed = (hit_left_boundary & (BC_left == 3)) | (hit_right_boundary & (BC_right == 3))
 
-    q   = jnp.where(absorbed, 0, jnp.where(mixed, q * weight_ratio, q))
+    q   = jnp.where(absorbed, 0, jnp.where(mixed, q * mixed_BC_weight, q))
     q_m = jnp.where(absorbed, 0, q_m)
-    m   = jnp.where(mixed, m * weight_ratio, m)
+    m   = jnp.where(mixed, m * mixed_BC_weight, m)
 
     return jnp.array([x_n0, x_n1, x_n2]), v_n, q, q_m, m
 
 @jit
-def set_BC_particles(xs_n, vs_n, qs, ms, q_ms, dx, grid, box_size_x, box_size_y, box_size_z, BC_left, BC_right):
+def set_BC_particles(xs_n, vs_n, qs, ms, q_ms, dx, grid, box_size_x, box_size_y, box_size_z, BC_left, BC_right, mixed_BC_weight):
     """
     Applies boundary conditions to all particles in parallel.
 
@@ -91,7 +90,7 @@ def set_BC_particles(xs_n, vs_n, qs, ms, q_ms, dx, grid, box_size_x, box_size_y,
         tuple: Updated positions, velocities, charges, masses, and charge-to-mass ratios for all particles.
     """
     xs_n, vs_n, qs, q_ms, ms = vmap(
-        lambda x_n, v_n, q, q_m, m: set_BC_single_particle(x_n, v_n, q, q_m, m, dx, grid, box_size_x, box_size_y, box_size_z, BC_left, BC_right)
+        lambda x_n, v_n, q, q_m, m: set_BC_single_particle(x_n, v_n, q, q_m, m, dx, grid, box_size_x, box_size_y, box_size_z, BC_left, BC_right, mixed_BC_weight)
     )(xs_n, vs_n, qs, q_ms, ms)
     return xs_n, vs_n, qs, ms, q_ms
 
@@ -109,8 +108,11 @@ def set_BC_single_particle_positions(x_n, dx, grid, box_size_x, box_size_y, box_
     x_n1 = (x_n[1] + box_size_y / 2) % box_size_y - box_size_y / 2
     x_n2 = (x_n[2] + box_size_z / 2) % box_size_z - box_size_z / 2
 
+    hit_left_boundary = x_n[0] < -box_size_x / 2
+    hit_right_boundary = x_n[0] > box_size_x / 2
+
     x_n0 = jnp.select(
-        [x_n[0] < -box_size_x / 2, x_n[0] > box_size_x / 2],
+        [hit_left_boundary, hit_right_boundary],
         [jnp.select(
             [BC_left == 0, BC_left == 1, BC_left == 2, BC_left == 3],
             [(x_n[0] + box_size_x / 2) % box_size_x - box_size_x / 2, -box_size_x - x_n[0], grid[0] - 1.5 * dx, -box_size_x - x_n[0]]
